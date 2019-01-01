@@ -1,7 +1,8 @@
-use env_logger;
-use log::*;
-use pkg_config;
+extern crate env_logger;
+extern crate log;
+extern crate pkg_config;
 
+use log::*;
 use std::env;
 use std::path::PathBuf;
 
