@@ -1,56 +1,8 @@
-extern crate env_logger;
-extern crate log;
-extern crate pkg_config;
-
 use log::*;
 use std::env;
 use std::path::PathBuf;
 
 const PCAP_HEADER: &'static str = "pcap.h";
-
-fn find_it(to_find: &str) -> Option<PathBuf> {
-    env::var_os("PATH")
-        .and_then(|paths| {
-            env::split_paths(&paths)
-                .filter_map(|dir| {
-                    let full_path = dir.join(to_find);
-                    if full_path.is_file() {
-                        Some(full_path)
-                    } else {
-                        None
-                    }
-                })
-                .next()
-        })
-        .or_else(|| {
-            let include_path = PathBuf::from("/usr/include");
-            let pcap_path = include_path.join(PCAP_HEADER);
-            if pcap_path.exists() {
-                Some(pcap_path)
-            } else {
-                None
-            }
-        })
-}
-
-fn locate_libpcap_header() -> Option<PathBuf> {
-    let library = if let Ok(l) = pkg_config::Config::new()
-        .atleast_version("1.5.3-11")
-        .probe("libpcap-devel")
-    {
-        l
-    } else {
-        return None;
-    };
-
-    for include_path in library.include_paths {
-        let pcap_path = include_path.join(PCAP_HEADER);
-        if pcap_path.exists() {
-            return Some(pcap_path);
-        }
-    }
-    None
-}
 
 fn main() {
     let _ = env_logger::try_init();
@@ -60,10 +12,14 @@ fn main() {
 
     let libpcap_path = if let Some(pcap_dir) = env::var_os("LIBPCAP_DIR") {
         PathBuf::from(pcap_dir).join(PCAP_HEADER)
-    } else if let Some(p) = locate_libpcap_header() {
-        p
     } else {
-        find_it(PCAP_HEADER).expect("Failed to find pcap header in path")
+        locate_header::locate_header(
+            PCAP_HEADER,
+            Some(locate_header::Package {
+                version: "1.5.3-11".to_owned(),
+                name: "libpcap-devel".to_owned()
+            })
+        ).expect(&format!("Failed to find {}", PCAP_HEADER))
     }
     .to_str()
     .expect("No path provided")

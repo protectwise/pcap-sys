@@ -3,12 +3,12 @@ name = "pcap-sys"
 version = "0.1.0"
 authors = ["Danny Browning <danny.browning@protectwise.com>"]
 build = "build.rs"
+edition = "2018"
 
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.46"
-cc = "1.0"
+bindgen = "0.51"
 env_logger = "0.6"
+locate-header = { git = "https://github.com/dbcfd/locate-header.git", branch = "master" }
 log = "0.4"
-pkg-config = "0.3"
