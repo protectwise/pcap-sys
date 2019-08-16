@@ -20,19 +20,34 @@ fn main() {
                 name: "libpcap-devel".to_owned()
             })
         ).expect(&format!("Failed to find {}", PCAP_HEADER))
-    }
-    .to_str()
-    .expect("No path provided")
-    .to_string();
+    };
+
+    let libpcap_header = libpcap_path
+        .to_str()
+        .expect("No path provided")
+        .to_string();
 
     info!(
         "Generating binding for libpcap using header {}",
-        libpcap_path
+        libpcap_header
     );
+
+    let libpcap_include_dir = libpcap_path.parent()
+        .expect("Could not get pcap file parent")
+        .parent()
+        .expect("Could not get pcap directory parent");
+
+    let clang_args = [
+        format!(
+            "-I{}",
+            libpcap_include_dir.to_str().expect("Failed to convert to string")
+        ),
+    ];
 
     let bindings = bindgen::Builder::default()
         .trust_clang_mangling(false)
-        .header(libpcap_path.clone())
+        .clang_args(&clang_args)
+        .header(libpcap_header.clone())
         .generate()
         .expect("Unable to generate bindings");
 
@@ -41,7 +56,7 @@ fn main() {
         .write_to_file(output_dir.join("pcap.rs"))
         .expect("Couldn't write bindings!");
 
-    println!("cargo:rerun-if-changed={}", libpcap_path);
+    println!("cargo:rerun-if-changed={}", libpcap_header);
     println!(
         "cargo:rerun-if-changed={}/build.rs",
         cargo_dir.to_str().expect("Failed to convert to string")
