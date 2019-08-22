@@ -10,5 +10,5 @@ edition = "2018"
 [build-dependencies]
 bindgen = "0.51"
 env_logger = "0.6"
-locate-header = { git = "https://github.com/dbcfd/locate-header.git", branch = "master" }
+locate-header = { git = "https://github.com/dbcfd/locate-header.git", tag = "v0.1.0" }
 log = "0.4"
