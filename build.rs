@@ -17,7 +17,7 @@ fn main() {
             PCAP_HEADER,
             Some(locate_header::Package {
                 version: "1.5.3-11".to_owned(),
-                name: "libpcap-devel".to_owned()
+                name: "libpcap-dev".to_owned()
             })
         ).expect(&format!("Failed to find {}", PCAP_HEADER))
     };
