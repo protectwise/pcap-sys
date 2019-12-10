@@ -48,6 +48,7 @@ fn main() {
         .trust_clang_mangling(false)
         .clang_args(&clang_args)
         .header(libpcap_header.clone())
+        .opaque_type("sockaddr")
         .generate()
         .expect("Unable to generate bindings");
 
